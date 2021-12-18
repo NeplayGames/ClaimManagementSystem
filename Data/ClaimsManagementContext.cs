@@ -11,4 +11,10 @@ public class ClaimsManagementContext : DbContext
     }
 
     public DbSet<Claim> Claims => Set<Claim>();
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(ClaimsManagementContext).Assembly);
+    }
 }
