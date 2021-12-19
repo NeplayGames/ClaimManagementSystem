@@ -1,3 +1,4 @@
+using ClaimsManagementSystem.Contracts.Claims;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ClaimsManagementSystem.Controllers;
@@ -7,25 +8,25 @@ namespace ClaimsManagementSystem.Controllers;
 public class ClaimsController : ControllerBase
 {
     [HttpGet]
-    public IActionResult GetClaims()
+    public ActionResult<IReadOnlyCollection<ClaimListItemResponseDto>> GetClaims()
     {
         return StatusCode(StatusCodes.Status501NotImplemented);
     }
 
     [HttpGet("{id:guid}")]
-    public IActionResult GetClaimById(Guid id)
+    public ActionResult<ClaimDetailsResponseDto> GetClaimById(Guid id)
     {
         return StatusCode(StatusCodes.Status501NotImplemented);
     }
 
     [HttpPost]
-    public IActionResult CreateClaim()
+    public ActionResult<ClaimDetailsResponseDto> CreateClaim([FromBody] CreateClaimRequestDto request)
     {
         return StatusCode(StatusCodes.Status501NotImplemented);
     }
 
     [HttpPut("{id:guid}")]
-    public IActionResult UpdateClaim(Guid id)
+    public ActionResult<ClaimDetailsResponseDto> UpdateClaim(Guid id, [FromBody] UpdateClaimRequestDto request)
     {
         return StatusCode(StatusCodes.Status501NotImplemented);
     }
