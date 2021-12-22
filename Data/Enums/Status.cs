@@ -1,9 +1,8 @@
-﻿namespace TicketSupportSystem.Data.Enums
+namespace ClaimsManagementSystem.Data.Enums;
+
+public enum Status
 {
-    public enum Status
-    {
-        Open = 0,
-        InProgress = 1,
-        Closed = 2
-    }
+    Open = 0,
+    InProgress = 1,
+    Closed = 2
 }

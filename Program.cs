@@ -1,4 +1,6 @@
 using ClaimsManagementSystem.Data;
+using ClaimsManagementSystem.Middleware;
+using ClaimsManagementSystem.Services.Claims;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -6,6 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddScoped<IClaimsService, ClaimsService>();
 
 var useInMemoryForDevelopment = builder.Configuration.GetValue<bool>("DataStore:UseInMemoryForDevelopment");
 builder.Services.AddDbContext<ClaimsManagementContext>(options =>
@@ -37,6 +40,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
