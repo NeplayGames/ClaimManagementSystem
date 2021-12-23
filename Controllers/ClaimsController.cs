@@ -16,13 +16,17 @@ public class ClaimsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IReadOnlyCollection<ClaimListItemResponseDto>>> GetClaims(CancellationToken cancellationToken)
+    [ProducesResponseType(typeof(PagedResponseDto<ClaimListItemResponseDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<PagedResponseDto<ClaimListItemResponseDto>>> GetClaims([FromQuery] ClaimListQueryRequestDto query, CancellationToken cancellationToken)
     {
-        var claims = await _claimsService.GetClaimsAsync(cancellationToken);
+        var claims = await _claimsService.GetClaimsAsync(query, cancellationToken);
         return Ok(claims);
     }
 
     [HttpGet("{id:guid}")]
+    [ProducesResponseType(typeof(ClaimDetailsResponseDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ClaimDetailsResponseDto>> GetClaimById(Guid id, CancellationToken cancellationToken)
     {
         var claim = await _claimsService.GetClaimByIdAsync(id, cancellationToken);
@@ -30,6 +34,9 @@ public class ClaimsController : ControllerBase
     }
 
     [HttpPost]
+    [ProducesResponseType(typeof(ClaimDetailsResponseDto), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
     public async Task<ActionResult<ClaimDetailsResponseDto>> CreateClaim([FromBody] CreateClaimRequestDto request, CancellationToken cancellationToken)
     {
         var claim = await _claimsService.CreateClaimAsync(request, cancellationToken);
@@ -37,6 +44,10 @@ public class ClaimsController : ControllerBase
     }
 
     [HttpPut("{id:guid}")]
+    [ProducesResponseType(typeof(ClaimDetailsResponseDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
     public async Task<ActionResult<ClaimDetailsResponseDto>> UpdateClaim(Guid id, [FromBody] UpdateClaimRequestDto request, CancellationToken cancellationToken)
     {
         var claim = await _claimsService.UpdateClaimAsync(id, request, cancellationToken);
@@ -44,6 +55,8 @@ public class ClaimsController : ControllerBase
     }
 
     [HttpDelete("{id:guid}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteClaim(Guid id, CancellationToken cancellationToken)
     {
         await _claimsService.DeleteClaimAsync(id, cancellationToken);

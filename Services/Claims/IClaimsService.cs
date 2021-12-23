@@ -4,7 +4,7 @@ namespace ClaimsManagementSystem.Services.Claims;
 
 public interface IClaimsService
 {
-    Task<IReadOnlyCollection<ClaimListItemResponseDto>> GetClaimsAsync(CancellationToken cancellationToken = default);
+    Task<PagedResponseDto<ClaimListItemResponseDto>> GetClaimsAsync(ClaimListQueryRequestDto query, CancellationToken cancellationToken = default);
     Task<ClaimDetailsResponseDto> GetClaimByIdAsync(Guid id, CancellationToken cancellationToken = default);
     Task<ClaimDetailsResponseDto> CreateClaimAsync(CreateClaimRequestDto request, CancellationToken cancellationToken = default);
     Task<ClaimDetailsResponseDto> UpdateClaimAsync(Guid id, UpdateClaimRequestDto request, CancellationToken cancellationToken = default);
