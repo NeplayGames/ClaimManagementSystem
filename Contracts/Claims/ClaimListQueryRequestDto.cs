@@ -5,8 +5,8 @@ namespace ClaimsManagementSystem.Contracts.Claims;
 
 public class ClaimListQueryRequestDto : IValidatableObject
 {
-    private static readonly string[] AllowedSortBy = ["createdAt", "updatedAt", "title", "status"];
-    private static readonly string[] AllowedSortDirection = ["asc", "desc"];
+    private static readonly string[] AllowedSortBy = new[] { "createdAt", "updatedAt", "title", "status" };
+    private static readonly string[] AllowedSortDirection = new[] { "asc", "desc" };
 
     [Range(1, int.MaxValue)]
     public int Page { get; set; } = 1;
@@ -30,12 +30,18 @@ public class ClaimListQueryRequestDto : IValidatableObject
     {
         if (!AllowedSortBy.Contains(SortBy, StringComparer.OrdinalIgnoreCase))
         {
-            yield return new ValidationResult($"sortBy must be one of: {string.Join(", ", AllowedSortBy)}.", [nameof(SortBy)]);
+            yield return new ValidationResult(
+                $"sortBy must be one of: {string.Join(", ", AllowedSortBy)}.",
+                new[] { nameof(SortBy) }
+            );
         }
 
         if (!AllowedSortDirection.Contains(SortDirection, StringComparer.OrdinalIgnoreCase))
         {
-            yield return new ValidationResult($"sortDirection must be one of: {string.Join(", ", AllowedSortDirection)}.", [nameof(SortDirection)]);
+            yield return new ValidationResult(
+                $"sortDirection must be one of: {string.Join(", ", AllowedSortDirection)}.",
+                new[] { nameof(SortDirection) }
+            );
         }
     }
 }
