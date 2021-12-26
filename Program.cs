@@ -8,6 +8,9 @@ using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Logging.ClearProviders();
+builder.Logging.AddJsonConsole();
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -25,6 +28,8 @@ builder.Services.AddDbContext<ClaimsManagementContext>(options =>
     var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
     options.UseSqlServer(connectionString);
 });
+
+builder.Services.AddHealthChecks();
 
 var jwtIssuer = builder.Configuration["Jwt:Issuer"];
 var jwtAudience = builder.Configuration["Jwt:Audience"];
@@ -77,8 +82,49 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();
+
+app.Use(async (context, next) =>
+{
+    await next();
+
+    if (!context.Request.Path.StartsWithSegments("/api/claims", StringComparison.OrdinalIgnoreCase))
+    {
+        return;
+    }
+
+    var eventType = context.Request.Method.ToUpperInvariant() switch
+    {
+        "POST" => "claim_created",
+        "PUT" or "PATCH" => "claim_updated",
+        "DELETE" => "claim_deleted",
+        _ => "claim_read"
+    };
+
+    if (eventType is "claim_read")
+    {
+        return;
+    }
+
+    var logger = context.RequestServices.GetRequiredService<ILoggerFactory>().CreateLogger("ClaimsLifecycle");
+    var claimId = context.Request.RouteValues.TryGetValue("id", out var routeValue) ? routeValue?.ToString() : null;
+
+    logger.LogInformation(
+        "Claim lifecycle event {EventType} for claim {ClaimId} responded with status {StatusCode}",
+        eventType,
+        claimId,
+        context.Response.StatusCode);
+});
+
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
+app.MapHealthChecks("/health");
+app.MapGet("/health/ready", async (ClaimsManagementContext dbContext, CancellationToken cancellationToken) =>
+{
+    var canConnect = await dbContext.Database.CanConnectAsync(cancellationToken);
+    return canConnect
+        ? Results.Ok(new { status = "ready" })
+        : Results.StatusCode(StatusCodes.Status503ServiceUnavailable);
+});
 app.MapControllers();
 app.Run();
